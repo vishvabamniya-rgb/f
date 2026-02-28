@@ -12,9 +12,11 @@
     }
     *{box-sizing:border-box}
     body{
-      margin:0; color:var(--text); background: radial-gradient(1100px 700px at 20% 10%, rgba(90,140,255,.18), transparent 60%),
-              radial-gradient(900px 600px at 90% 20%, rgba(0,255,200,.12), transparent 60%),
-              var(--bg);
+      margin:0; color:var(--text);
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(90,140,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(0,255,200,.12), transparent 60%),
+        var(--bg);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
     }
     header{
@@ -266,10 +268,14 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  // ✅ Proxy endpoints (Vercel functions)
   const API_EBOOKS = "/api/ebooks";
   const API_CHAPTERS = (bookId) => `/api/chapters/${encodeURIComponent(bookId)}`;
+
+  // ✅ External open links
   const DOWNLOAD_BASE = "https://pinnaclefull.vercel.app/fullbook/"; // + {book_id}
-  const CHAPTER_OPEN_BASE = "https://pinc-jet.vercel.app/ebook/";     // + {chapter_id}
+  const CHAPTER_OPEN_BASE = "https://pinc-jet.vercel.app/ebook/";     // + {sub_id}
+
   const grid = document.getElementById("grid");
   const q = document.getElementById("q");
   const reloadBtn = document.getElementById("reload");
@@ -305,7 +311,7 @@
   }
 
   function makeCard(book){
-    const id = book?._id; // important: _id is used as book_id in both endpoints
+    const id = book?._id; // ✅ BOOK_ID
     const title = safeText(book?.title);
     const img = safeText(book?.image);
     const medium = safeText(book?.medium);
@@ -354,6 +360,7 @@
     const actions = document.createElement("div");
     actions.className = "actions";
 
+    // ✅ Download uses BOOK_ID
     const btnDownload = document.createElement("button");
     btnDownload.className = "btn primary";
     btnDownload.textContent = "⬇ Download";
@@ -364,12 +371,13 @@
       window.open(DOWNLOAD_BASE + encodeURIComponent(id), "_blank", "noopener,noreferrer");
     };
 
+    // ✅ Subjects list uses BOOK_ID (via proxy)
     const btnSubjects = document.createElement("button");
     btnSubjects.className = "btn";
     btnSubjects.textContent = "📚 Subject";
     btnSubjects.onclick = () => {
       if (!id) return showToast("Book ID missing!");
-      openSubjectsModal(book);
+      openSubjectsModal(book); // ✅ passes BOOK object
     };
 
     actions.appendChild(btnDownload);
@@ -428,7 +436,7 @@
         <div style="color:#ffb4b4;padding:10px 6px;">
           ❌ Error loading ebooks. <br/>
           <span style="color:var(--muted)">Reason: ${safeText(err?.message || err)}</span><br/><br/>
-          <span style="color:var(--muted)">If CORS issue comes, host a small proxy or open from a server.</span>
+          <span style="color:var(--muted)">Fix: Ensure Vercel api/ebooks.js exists and /api/ebooks works.</span>
         </div>
       `;
     }
@@ -443,8 +451,9 @@
     document.body.style.overflow = "auto";
   }
 
+  // ✅ This loads chapters list using BOOK_ID via proxy
   async function openSubjectsModal(book){
-    const bookId = book?._id;
+    const bookId = book?._id; // ✅ BOOK_ID
     modalTitle.textContent = book?.title ? `Subjects: ${book.title}` : "Subjects";
     modalSub.textContent = `Book ID: ${bookId}`;
     chapList.innerHTML = "";
@@ -470,7 +479,7 @@
       for (const ch of chapters){
         const row = document.createElement("div");
         row.className = "chap";
-        row.title = "Open chapter link";
+        row.title = "Open subject link";
 
         const left = document.createElement("div");
         left.className = "chapLeft";
@@ -493,10 +502,11 @@
         row.appendChild(left);
         row.appendChild(openTag);
 
+        // ✅ Clicking subject opens: https://pinc-jet.vercel.app/ebook/{sub_id}
         row.onclick = () => {
-          const chapterId = ch?._id;
-          if (!chapterId) return showToast("Chapter ID missing!");
-          window.open(CHAPTER_OPEN_BASE + encodeURIComponent(chapterId), "_blank", "noopener,noreferrer");
+          const subjectId = ch?._id; // ✅ SUB_ID
+          if (!subjectId) return showToast("Subject ID missing!");
+          window.open(CHAPTER_OPEN_BASE + encodeURIComponent(subjectId), "_blank", "noopener,noreferrer");
         };
 
         frag.appendChild(row);
