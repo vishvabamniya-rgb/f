@@ -273,8 +273,8 @@
   const API_CHAPTERS = (bookId) => `/api/chapters/${encodeURIComponent(bookId)}`;
 
   // ✅ External open links
-  const DOWNLOAD_BASE = "https://pinnaclefull.vercel.app/fullbook/"; // + {book_id}
-  const CHAPTER_OPEN_BASE = "https://pinc-jet.vercel.app/ebook/";     // + {sub_id}
+  const DOWNLOAD_BASE = "https://pncallcontent-ten.vercel.app/fullbook/"; // + {book_id}
+  const CHAPTER_OPEN_BASE = "https://pincbookcontent.vercel.app/ebook/";     // + {sub_id}
 
   const grid = document.getElementById("grid");
   const q = document.getElementById("q");
@@ -502,7 +502,7 @@
         row.appendChild(left);
         row.appendChild(openTag);
 
-        // ✅ Clicking subject opens: https://pinc-jet.vercel.app/ebook/{sub_id}
+        // ✅ Clicking subject opens: https://pincbookcontent.vercel.app/ebook/{sub_id}
         row.onclick = () => {
           const subjectId = ch?._id; // ✅ SUB_ID
           if (!subjectId) return showToast("Subject ID missing!");
